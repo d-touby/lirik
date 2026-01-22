@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For You ❤️</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap');
+        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #fff0f3; font-family: 'Poppins', sans-serif; text-align: center; overflow: hidden; }
+        .container { z-index: 10; width: 90%; }
+        #pesan-atas { color: #ff4d6d; font-size: 1.2rem; margin-bottom: 20px; }
+        #btn-start { padding: 15px 40px; font-size: 1.2rem; background: #ff4d6d; color: white; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; }
+        #lyric-display { margin-top: 20px; font-size: 1.8rem; color: #590d22; min-height: 100px; display: flex; align-items: center; justify-content: center; }
+        .lyrics-active { animation: pulse 0.1s ease-out; }
+        @keyframes pulse { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        #youtube-player { position: absolute; top: -1000px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="pesan-atas">Gak bisa edit video, cuman bisa bikin ini ❤️</div>
+        <button id="btn-start">Klik buat dengerin</button>
+        <div id="lyric-display"></div>
+    </div>
+    <div id="youtube-player"></div>
+
+    <script>
+        let player;
+        const btn = document.getElementById('btn-start');
+        const lyricDisplay = document.getElementById('lyric-display');
+
+        const lyrics = [
+            { time: 63.100, text: "Isi pikiranku kamu..." },
+            { time: 65.500, text: "Jadi terlalu banyak buang waktu" },
+            { time: 67.800, text: "Dari atas sampai bawah anggun" },
+            { time: 70.300, text: "Baby know that I just wanna be..." },
+            { time: 72.000, text: "...with you ❤️" },
+            { time: 73.100, text: "Siang-siang kepikiran" },
+            { time: 74.800, text: "Malam-malam sendirian" },
+            { time: 76.700, text: "Scrolling TikTok fitnah isi cinta-cintaan" },
+            { time: 79.200, text: "Know that one day I will ask you" },
+            { time: 80.900, text: "To be my boy..." },
+            { time: 82.300, text: "Jangan malu-malu boy" },
+            { time: 84.800, text: "Kamu itu lucu boy" },
+            { time: 86.800, text: "Don't waste my time..." },
+            { time: 88.200, text: "So please say it now!" },
+            { time: 90.600, text: "Kamu mau apa? Semua aku bisa" },
+            { time: 94.500, text: "Just look my eyes..." },
+            { time: 96.600, text: "Sure you wouldn't think twice ✨" }, // Lirik Terakhir
+        ];
+
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        document.body.appendChild(tag);
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtube-player', {
+                height: '0', width: '0',
+                videoId: 'LMIS2PMqCL0',
+                playerVars: { 'start': 63, 'controls': 0 },
+            });
+        }
+
+        btn.addEventListener('click', () => {
+            if (player && player.playVideo) {
+                player.playVideo();
+                btn.style.display = 'none';
+                document.getElementById('pesan-atas').innerText = "Iziin... 🙏";
+                
+                const sync = setInterval(() => {
+                    const currentTime = player.getCurrentTime();
+                    
+                    // Cari indeks lirik saat ini
+                    const currentIndex = lyrics.findIndex((l, i) => {
+                        const nextLyric = lyrics[i + 1];
+                        return currentTime >= l.time && (!nextLyric || currentTime < nextLyric.time);
+                    });
+
+                    if (currentIndex !== -1) {
+                        const activeLyric = lyrics[currentIndex];
+                        
+                        // Update tampilan lirik
+                        if (lyricDisplay.innerText !== activeLyric.text) {
+                            lyricDisplay.innerHTML = `<div class="lyrics-active">${activeLyric.text}</div>`;
+                        }
+
+                        // BERHENTI DI SINI: Jika ini adalah lirik terakhir, matikan interval
+                        if (currentIndex === lyrics.length - 1) {
+                            clearInterval(sync); 
+                            // Opsional: player.stopVideo(); // Aktifkan jika ingin musik berhenti juga
+                        }
+                    }
+                }, 10); 
+            }
+        });
+    </script>
+</body>
+</html>
